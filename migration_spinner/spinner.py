@@ -4,9 +4,9 @@ import os
 import time
 
 from airflow import settings, version
-from alembic import script
+from alembic.script import ScriptDirectory
 from alembic.config import Config
-from alembic.runtime import migration
+from alembic.runtime.migration import MigrationContext
 
 
 # package_dir is path of installed airflow in your virtualenv or system (site-packages)
@@ -17,12 +17,13 @@ def spinner(timeout):
     config = Config(os.path.join(package_dir, 'alembic.ini'))
     config.set_main_option('script_location', directory)
     config.set_main_option('sqlalchemy.url', settings.SQL_ALCHEMY_CONN)
-    script_ = script.ScriptDirectory.from_config(config)
+    script_ = ScriptDirectory.from_config(config)
 
     with settings.engine.connect() as connection:
-        context = migration.MigrationContext.configure(connection)
+        context = MigrationContext.configure(connection)
         ticker = 0
         while True:
+            import ipdb; ipdb.set_trace()
             if script_.get_current_head() == context.get_current_revision():
                 logging.info('Airflow version: {}'.format(version.version))
                 logging.info('Current head: {}'.format(script_.get_current_head()))
