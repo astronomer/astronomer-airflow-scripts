@@ -29,11 +29,13 @@ def spinner(timeout):
                 logging.info('Current rev: {}'.format(context.get_current_revision()))
                 break
             elif ticker > timeout:
-                raise TimeoutError("ticker {} > timeout {}".format(ticker, timeout))
+                raise TimeoutError("There are no migrations for time period: {} "
+                                   "seconds".format(ticker, timeout))
             ticker += 1
             time.sleep(1)
+            logging.info('Waiting for migrations...')
 
 
 def main(args):
     logging.info(args)
-    spinner(args.airflow_package_dir)
+    spinner(args.timeout)

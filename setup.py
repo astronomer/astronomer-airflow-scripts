@@ -51,7 +51,7 @@ setup(
     packages=find_namespace_packages(where='migration_spinner'),
     package_data={'': ['LICENSE']},
     entry_points={
-        'console_scripts': ['migration-spinner=migration_spinner.command_line:main']
+        'console_scripts': ['airflow-migration-spinner=migration_spinner.command_line:main']
     },
     include_package_data=True,
     zip_safe=True,
