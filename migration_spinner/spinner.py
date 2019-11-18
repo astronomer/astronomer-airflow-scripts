@@ -23,7 +23,6 @@ def spinner(timeout):
         context = MigrationContext.configure(connection)
         ticker = 0
         while True:
-            import ipdb; ipdb.set_trace()
             if script_.get_current_head() == context.get_current_revision():
                 logging.info('Airflow version: {}'.format(version.version))
                 logging.info('Current head: {}'.format(script_.get_current_head()))
