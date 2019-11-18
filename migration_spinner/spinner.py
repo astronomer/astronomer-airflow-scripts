@@ -29,11 +29,11 @@ def spinner(timeout):
                 logging.info('Current rev: {}'.format(context.get_current_revision()))
                 break
             elif ticker > timeout:
-                raise TimeoutError("There are no migrations for time period: {} "
+                raise TimeoutError("There are still unapplied migrations after {} "
                                    "seconds".format(ticker, timeout))
             ticker += 1
             time.sleep(1)
-            logging.info('Waiting for migrations...')
+            logging.info('Waiting for migrations... {} second(s)'.format(ticker))
 
 
 def main(args):
