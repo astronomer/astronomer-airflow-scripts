@@ -1,5 +1,4 @@
 from unittest import mock
-from unittest.mock import MagicMock, Mock
 
 import pytest
 from migration_spinner.spinner import spinner
