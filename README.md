@@ -27,3 +27,20 @@ Traceback (most recent call last):
 TimeoutError: There are still unapplied migrations after: 6 seconds`
 
 Copyright © 2019 Astronomer Inc. See LICENSE for further details.
+
+
+## Release
+
+1. Build wheel
+```bash
+pip install -U wheel
+python setup.py sdist bdist_wheel
+ls -la dist
+total 24
+drwxr-xr-x   4 andrii  staff   128 Nov 19 14:55 .
+drwxr-xr-x  22 andrii  staff   704 Nov 19 14:55 ..
+-rw-r--r--   1 andrii  staff  2615 Nov 19 14:55 airflow-migration-spinner-0.0.1.tar.gz
+-rw-r--r--   1 andrii  staff  6629 Nov 19 14:55 airflow_migration_spinner-0.0.1-py3-none-any.whl
+```
+
+2. Upload to github releases page
