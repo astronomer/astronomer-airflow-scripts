@@ -5,7 +5,8 @@ Airflow][Airflow] project.
 
 ## Usage
 
-`airflow-migration-spinner --timeout 5
+```
+airflow-migration-spinner --timeout 5
 [2019-11-18 19:25:04,083] {spinner.py:40} INFO - Namespace(timeout=5)
 [2019-11-18 19:25:04,085] {migration.py:130} INFO - Context impl SQLiteImpl.
 [2019-11-18 19:25:04,086] {migration.py:137} INFO - Will assume non-transactional DDL.
@@ -24,7 +25,8 @@ Traceback (most recent call last):
     spinner(args.timeout)
   File "/Users/andrii/work/airflow-migration-spinner/migration_spinner/spinner.py", line 33, in spinner
     "seconds".format(ticker, timeout))
-TimeoutError: There are still unapplied migrations after: 6 seconds`
+TimeoutError: There are still unapplied migrations after: 6 seconds
+```
 
 Copyright © 2019 Astronomer Inc. See LICENSE for further details.
 
