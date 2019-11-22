@@ -3,7 +3,21 @@
 Tool for checking status of alembic migrations inside [Apache
 Airflow][Airflow] project.
 
-## Usage
+## Usage `airflow-cleanup-pods`
+
+```bash
+$ airflow-cleanup-pods -h
+usage: airflow-cleanup-pods [-h] [--namespace NAMESPACE]
+
+Clean up k8s pods in evicted/failed/succeeded states.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --namespace NAMESPACE
+                        Namespace
+```
+
+## Usage `airflow-migration-spinner`
 
 ```
 airflow-migration-spinner --timeout 5
@@ -28,9 +42,6 @@ Traceback (most recent call last):
 TimeoutError: There are still unapplied migrations after: 6 seconds
 ```
 
-Copyright © 2019 Astronomer Inc. See LICENSE for further details.
-
-
 ## Release
 
 1. Build wheel
@@ -46,3 +57,6 @@ drwxr-xr-x  22 andrii  staff   704 Nov 19 14:55 ..
 ```
 
 2. Upload to github releases page
+
+
+Copyright © 2019 Astronomer Inc. See LICENSE for further details.
