@@ -1,5 +1,18 @@
 import argparse
+import logging
 from kubernetes import client, config
+
+# https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
+POD_PHASE = [
+    # All Containers in the Pod have terminated in success, and will not be restarted.
+    'succeeded',
+    # All Containers in the Pod have terminated, and at least one Container has terminated in failure.
+    # That is, the Container either exited with non-zero status or was terminated by the system.
+    'failed'
+]
+
+# https://kubernetes.io/docs/tasks/administer-cluster/out-of-resource/
+POD_REASON = ['evicted']
 
 
 def delete_pod(name, namespace):
@@ -9,7 +22,7 @@ def delete_pod(name, namespace):
         name=name,
         namespace=namespace,
         body=delete_options)
-    print(api_response)
+    logging.info(api_response)
 
 
 def cleanup(args):
@@ -17,10 +30,10 @@ def cleanup(args):
     core_v1 = client.CoreV1Api()
     pod_list = core_v1.list_namespaced_pod(args.namespace)
     for pod in pod_list.items:
-        if pod.status.phase.lower() in ['failed', 'success'] or (
-                pod.status.reason and pod.status.reason.lower() == 'evicted'):
-            print(pod.status.phase)
-            print(pod.status.reason)
+        logging.info(pod.status)
+        logging.info(pod.status.reason)
+        pod_phase, pod_reason = pod.status.phase, pod.status.reason
+        if pod_phase.lower() in POD_PHASE or (pod_reason and pod_reason.lower() in POD_REASON):
             delete_pod(pod.name, args.namespace)
 
 
