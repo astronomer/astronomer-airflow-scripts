@@ -1,7 +1,6 @@
 # airflow-migration-spinner
 
-Tool for checking status of alembic migrations inside [Apache
-Airflow][Airflow] project.
+Set of astronomer cli-tools.
 
 ## Usage `airflow-cleanup-pods`
 

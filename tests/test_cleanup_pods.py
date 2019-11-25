@@ -1,21 +1,11 @@
 from unittest import mock
 
-import pytest
-from migration_spinner.command_line import spinner
+from cleanup_pods.command_line import delete_pod
 
 
-@mock.patch('alembic.runtime.migration.MigrationContext.get_current_revision')
-@mock.patch('alembic.script.base.ScriptDirectory.get_current_head')
-def test_spinner_success(get_current_head, get_current_revision):
-    get_current_revision.return_value = "00000000"
-    get_current_head.return_value = "00000000"
-    spinner(timeout=0)
-
-
-@mock.patch('alembic.runtime.migration.MigrationContext.get_current_revision')
-@mock.patch('alembic.script.base.ScriptDirectory.get_current_head')
-def test_spinner_one_sec_timeout(get_current_head, get_current_revision):
-    get_current_revision.return_value = "00000000"
-    get_current_head.return_value = "10000000"
-    with pytest.raises(TimeoutError):
-        spinner(timeout=1)
+@mock.patch('kubernetes.client.CoreV1Api.delete_namespaced_pod')
+def test_delete_pod(delete_namespaced_pod):
+    delete_pod('dummy', 'awesome-namespace')
+    delete_namespaced_pod.assert_called_with(
+        body=mock.ANY, name='dummy', namespace='awesome-namespace'
+    )
