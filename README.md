@@ -1,6 +1,4 @@
-# airflow-migration-spinner
-
-Set of astronomer cli-tools.
+# Set of astronomer cli-tools.
 
 ## Usage `airflow-cleanup-pods`
 

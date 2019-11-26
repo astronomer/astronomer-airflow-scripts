@@ -1,14 +1,14 @@
 import argparse
-
 import importlib
 import logging
 import os
 import time
 
-from airflow import settings, version
-from alembic.script import ScriptDirectory
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
+from alembic.script import ScriptDirectory
+
+from airflow import settings, version
 
 
 # package_dir is path of installed airflow in your virtualenv or system (site-packages)

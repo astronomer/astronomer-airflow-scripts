@@ -41,7 +41,7 @@ def find_version(*paths):
 setup(
     name='astronomer-airflow-scripts',
     version=find_version('version.py'),
-    url='https://github.com/astronomer/airflow-migration-spinner',
+    url='https://github.com/astronomer/astronomer-airflow-scripts',
     license='Apache2',
     author='astronomerio',
     author_email='humans@astronomer.io',
@@ -52,8 +52,8 @@ setup(
     package_data={'': ['LICENSE']},
     entry_points={
         'console_scripts': [
-            'airflow-migration-spinner=migration_spinner.command_line:main',
-            'airflow-cleanup-pods=cleanup_pods.command_line:main',
+            'airflow-migration-spinner=astronomer.migration_spinner.command_line:main',
+            'airflow-cleanup-pods=astronomer.cleanup_pods.command_line:main',
         ]
     },
     include_package_data=True,

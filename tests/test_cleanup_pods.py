@@ -1,11 +1,9 @@
 from unittest import mock
-from unittest.mock import PropertyMock, Mock, MagicMock
+from unittest.mock import MagicMock
 
 import kubernetes
-from kubernetes.client.rest import ApiException
-import pytest
 
-from cleanup_pods.command_line import delete_pod, cleanup
+from astronomer.cleanup_pods.command_line import cleanup, delete_pod
 
 
 @mock.patch('kubernetes.client.CoreV1Api.delete_namespaced_pod')
@@ -16,7 +14,7 @@ def test_delete_pod(delete_namespaced_pod):
     )
 
 
-@mock.patch('cleanup_pods.command_line.delete_pod')
+@mock.patch('astronomer.cleanup_pods.command_line.delete_pod')
 @mock.patch('kubernetes.client.CoreV1Api.list_namespaced_pod')
 def test_cleanup_succeeded_pods(list_namespaced_pod, delete_pod):
     pod1 = MagicMock()
@@ -28,7 +26,7 @@ def test_cleanup_succeeded_pods(list_namespaced_pod, delete_pod):
     delete_pod.assert_called_with('dummy', 'awesome-namespace')
 
 
-@mock.patch('cleanup_pods.command_line.delete_pod')
+@mock.patch('astronomer.cleanup_pods.command_line.delete_pod')
 @mock.patch('kubernetes.client.CoreV1Api.list_namespaced_pod')
 def test_no_cleanup_failed_pods_wo_restart_policy_never(list_namespaced_pod, delete_pod):
     pod1 = MagicMock()
@@ -41,7 +39,7 @@ def test_no_cleanup_failed_pods_wo_restart_policy_never(list_namespaced_pod, del
     delete_pod.assert_not_called()
 
 
-@mock.patch('cleanup_pods.command_line.delete_pod')
+@mock.patch('astronomer.cleanup_pods.command_line.delete_pod')
 @mock.patch('kubernetes.client.CoreV1Api.list_namespaced_pod')
 def test_cleanup_failed_pods_w_restart_policy_never(list_namespaced_pod, delete_pod):
     pod1 = MagicMock()
@@ -54,7 +52,7 @@ def test_cleanup_failed_pods_w_restart_policy_never(list_namespaced_pod, delete_
     delete_pod.assert_called_with('dummy3', 'awesome-namespace')
 
 
-@mock.patch('cleanup_pods.command_line.delete_pod')
+@mock.patch('astronomer.cleanup_pods.command_line.delete_pod')
 @mock.patch('kubernetes.client.CoreV1Api.list_namespaced_pod')
 def test_cleanup_evicted_pods(list_namespaced_pod, delete_pod):
     pod1 = MagicMock()
@@ -67,7 +65,7 @@ def test_cleanup_evicted_pods(list_namespaced_pod, delete_pod):
     delete_pod.assert_called_with('dummy4', 'awesome-namespace')
 
 
-@mock.patch('cleanup_pods.command_line.delete_pod')
+@mock.patch('astronomer.cleanup_pods.command_line.delete_pod')
 @mock.patch('kubernetes.client.CoreV1Api.list_namespaced_pod')
 def test_cleanup_api_exception_continue(list_namespaced_pod, delete_pod):
     delete_pod.side_effect = kubernetes.client.rest.ApiException(status=0)

@@ -1,7 +1,8 @@
 import argparse
+import logging
+
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
-import logging
 
 # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
 # All Containers in the Pod have terminated in success, and will not be restarted.
