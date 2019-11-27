@@ -1,12 +1,14 @@
+import argparse
 import importlib
 import logging
 import os
 import time
 
-from airflow import settings, version
-from alembic.script import ScriptDirectory
 from alembic.config import Config
 from alembic.runtime.migration import MigrationContext
+from alembic.script import ScriptDirectory
+
+from airflow import settings, version
 
 
 # package_dir is path of installed airflow in your virtualenv or system (site-packages)
@@ -36,6 +38,9 @@ def spinner(timeout):
             logging.info('Waiting for migrations... {} second(s)'.format(ticker))
 
 
-def main(args):
-    logging.info(args)
-    spinner(args.timeout)
+def main():
+    parser = argparse.ArgumentParser(description='Airflow migration spinner.')
+    parser.add_argument('--timeout', dest='timeout', default=60, type=int,
+                        help='Timeout for waiting until airflow migrations completes')
+    args = parser.parse_args()
+    spinner(args)

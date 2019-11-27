@@ -1,7 +1,8 @@
 from unittest import mock
 
 import pytest
-from migration_spinner.spinner import spinner
+
+from astronomer.migration_spinner.command_line import spinner
 
 
 @mock.patch('alembic.runtime.migration.MigrationContext.get_current_revision')

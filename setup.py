@@ -39,19 +39,22 @@ def find_version(*paths):
 
 
 setup(
-    name='airflow-migration-spinner',
-    version=find_version('migration_spinner', '__init__.py'),
-    url='https://github.com/astronomer/airflow-migration-spinner',
+    name='astronomer-airflow-scripts',
+    version=find_version('version.py'),
+    url='https://github.com/astronomer/astronomer-airflow-scripts',
     license='Apache2',
     author='astronomerio',
     author_email='humans@astronomer.io',
     description='',
     long_description=desc(),
     long_description_content_type="text/markdown",
-    packages=find_namespace_packages(where='migration_spinner'),
+    packages=find_namespace_packages(exclude='tests'),
     package_data={'': ['LICENSE']},
     entry_points={
-        'console_scripts': ['airflow-migration-spinner=migration_spinner.command_line:main']
+        'console_scripts': [
+            'airflow-migration-spinner=astronomer.migration_spinner.command_line:main',
+            'airflow-cleanup-pods=astronomer.cleanup_pods.command_line:main',
+        ]
     },
     include_package_data=True,
     zip_safe=True,

@@ -1,11 +1,23 @@
-# airflow-migration-spinner
+# Set of astronomer cli-tools.
 
-Tool for checking status of alembic migrations inside [Apache
-Airflow][Airflow] project.
+## Usage `airflow-cleanup-pods`
 
-## Usage
+```bash
+$ airflow-cleanup-pods -h
+usage: airflow-cleanup-pods [-h] [--namespace NAMESPACE]
 
-`airflow-migration-spinner --timeout 5
+Clean up k8s pods in evicted/failed/succeeded states.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --namespace NAMESPACE
+                        Namespace
+```
+
+## Usage `airflow-migration-spinner`
+
+```
+airflow-migration-spinner --timeout 5
 [2019-11-18 19:25:04,083] {spinner.py:40} INFO - Namespace(timeout=5)
 [2019-11-18 19:25:04,085] {migration.py:130} INFO - Context impl SQLiteImpl.
 [2019-11-18 19:25:04,086] {migration.py:137} INFO - Will assume non-transactional DDL.
@@ -24,10 +36,8 @@ Traceback (most recent call last):
     spinner(args.timeout)
   File "/Users/andrii/work/airflow-migration-spinner/migration_spinner/spinner.py", line 33, in spinner
     "seconds".format(ticker, timeout))
-TimeoutError: There are still unapplied migrations after: 6 seconds`
-
-Copyright © 2019 Astronomer Inc. See LICENSE for further details.
-
+TimeoutError: There are still unapplied migrations after: 6 seconds
+```
 
 ## Release
 
@@ -44,3 +54,6 @@ drwxr-xr-x  22 andrii  staff   704 Nov 19 14:55 ..
 ```
 
 2. Upload to github releases page
+
+
+Copyright © 2019 Astronomer Inc. See LICENSE for further details.
