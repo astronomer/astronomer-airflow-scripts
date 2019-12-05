@@ -25,12 +25,13 @@ def spinner(timeout):
         context = MigrationContext.configure(connection)
         ticker = 0
         while True:
-            if script_.get_current_head() == context.get_current_revision():
+            source_heads = set(script_.get_heads())
+            db_heads = set(context.get_current_heads())
+            if source_heads == db_heads:
                 logging.info('Airflow version: {}'.format(version.version))
-                logging.info('Current head: {}'.format(script_.get_current_head()))
-                logging.info('Current rev: {}'.format(context.get_current_revision()))
+                logging.info('Current heads: {}'.format(db_heads))
                 break
-            elif ticker > timeout:
+            elif ticker >= timeout:
                 raise TimeoutError("There are still unapplied migrations after {} "
                                    "seconds".format(ticker, timeout))
             ticker += 1
@@ -43,4 +44,8 @@ def main():
     parser.add_argument('--timeout', dest='timeout', default=60, type=int,
                         help='Timeout for waiting until airflow migrations completes')
     args = parser.parse_args()
-    spinner(args)
+    spinner(args.timeout)
+
+
+if __name__ == "__main__":
+    main()
