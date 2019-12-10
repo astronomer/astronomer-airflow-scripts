@@ -36,7 +36,7 @@ def delete_pod(name, namespace):
 
 
 def cleanup(namespace):
-    config.load_kube_config()
+    config.load_incluster_config()
     core_v1 = client.CoreV1Api()
     pod_list = core_v1.list_namespaced_pod(namespace)
 
