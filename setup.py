@@ -14,7 +14,7 @@
 import os
 import re
 
-from setuptools import find_namespace_packages, setup
+from setuptools import find_namespace_packages, setup, Command
 
 
 def fpath(*parts):
@@ -38,9 +38,33 @@ def find_version(*paths):
     raise RuntimeError("Unable to find version string.")
 
 
+# Cribbed from https://circleci.com/blog/continuously-deploying-python-packages-to-pypi-with-circleci/
+class VerifyVersionCommand(Command):
+    """Custom command to verify that the git tag matches our version"""
+    description = 'verify that the git tag matches our version'
+    user_options = []  # type: ignore
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        tag = os.getenv('CIRCLE_TAG')
+
+        if tag != "v" + VERSION:
+            info = "Git tag: {0} does not match the version of this app: v{1}".format(
+                tag, VERSION
+            )
+            exit(info)
+
+
+VERSION = find_version('version.py')
+
 setup(
     name='astronomer-airflow-scripts',
-    version=find_version('version.py'),
+    version=VERSION,
     url='https://github.com/astronomer/astronomer-airflow-scripts',
     license='Apache2',
     author='astronomerio',
@@ -60,15 +84,23 @@ setup(
     zip_safe=True,
     platforms='any',
     install_requires=[
-        'apache-airflow>=1.10.0',
+        'apache-airflow[kubernetes]>=1.10.0',
     ],
     setup_requires=[
         'pytest-runner~=4.0',
+        'wheel',
     ],
     tests_require=[
-        "pytest",
-        "pytest-mock",
+        'astronomer-airflow-scripts[test]'
     ],
+    extras_require={
+        'test': [
+            'flask-import-order>=0.18',
+            'pytest',
+            'pytest-mock',
+            'pytest-flake8',
+        ],
+    },
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
@@ -78,4 +110,5 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Programming Language :: Python :: 3',
     ],
+    cmdclass={"verify": VerifyVersionCommand}
 )
