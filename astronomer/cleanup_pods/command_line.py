@@ -42,6 +42,7 @@ def cleanup(namespace):
     core_v1 = client.CoreV1Api()
     logging.info('Listing namespaced pods in namespace {namespace}'.format(namespace=namespace))
     pod_list = core_v1.list_namespaced_pod(namespace)
+
     for pod in pod_list.items:
         logging.info('Inspecting pod {pod}'.format(pod=pod.metadata.name))
         pod_phase = pod.status.phase.lower()
@@ -60,7 +61,7 @@ def cleanup(namespace):
             except ApiException as e:
                 logging.error("can't remove POD: {}".format(e))
                 continue
-        logging.info('No action take on pod {pod}'.format(pod=pod.metadata.name))
+        logging.info('No action taken on pod {pod}'.format(pod=pod.metadata.name))
 
 
 def main():
