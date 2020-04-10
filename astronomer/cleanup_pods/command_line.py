@@ -36,11 +36,14 @@ def delete_pod(name, namespace):
 
 
 def cleanup(namespace):
+    logging.info('Loading Kubernetes configuration')
     config.load_incluster_config()
+    logging.debug('Initializing Kubernetes client')
     core_v1 = client.CoreV1Api()
+    logging.info('Listing namespaced pods in namespace {namespace}'.format(namespace=namespace))
     pod_list = core_v1.list_namespaced_pod(namespace)
-
     for pod in pod_list.items:
+        logging.info('Inspecting pod {pod}'.format(pod=pod.metadata.name))
         pod_phase = pod.status.phase.lower()
         pod_reason = pod.status.reason.lower() if pod.status.reason else ''
         pod_restart_policy = pod.spec.restart_policy.lower()
@@ -57,6 +60,7 @@ def cleanup(namespace):
             except ApiException as e:
                 logging.error("can't remove POD: {}".format(e))
                 continue
+        logging.info('No action take on pod {pod}'.format(pod=pod.metadata.name))
 
 
 def main():
