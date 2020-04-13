@@ -1,5 +1,6 @@
 import argparse
 import logging
+import sys
 
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
@@ -41,7 +42,12 @@ def cleanup(namespace):
     logging.debug('Initializing Kubernetes client')
     core_v1 = client.CoreV1Api()
     logging.info('Listing namespaced pods in namespace {namespace}'.format(namespace=namespace))
-    pod_list = core_v1.list_namespaced_pod(namespace)
+    try:
+        pod_list = core_v1.list_namespaced_pod(namespace)
+    except ApiException as e:
+        # if this fails we can't do anything more. log the error and exit
+        logging.error("Exception when calling CoreV1Api->list_namespaced_pod: {}".format(e))
+        sys.exit(1)
 
     for pod in pod_list.items:
         logging.info('Inspecting pod {pod}'.format(pod=pod.metadata.name))
