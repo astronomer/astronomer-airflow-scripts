@@ -1,9 +1,36 @@
 from unittest import mock
 from unittest.mock import MagicMock
+from datetime import datetime
+from dateutil.tz import tzutc
 
 import kubernetes
 
-from astronomer.cleanup_pods.command_line import cleanup, delete_pod
+from astronomer.cleanup_pods.command_line import cleanup, delete_pod, pod_is_stuck
+
+
+def test_pod_is_stuck():
+    mock_container_status = MagicMock()
+    mock_container_status.ready = False
+    mock_status = MagicMock()
+    mock_status.container_statuses = [mock_container_status]
+    mock_status.start_time = datetime(2020, 7, 16, 4, 56, 25, tzinfo=tzutc())
+    mock_pod = MagicMock()
+    mock_pod.status = mock_status
+    mock_pod.metadata.name = "old-pod"
+    assert pod_is_stuck(mock_pod, 15)
+
+
+def test_pod_is_not_stuck():
+    mock_container_status = MagicMock()
+    mock_container_status.ready = False
+    mock_status = MagicMock()
+    mock_status.container_statuses = [mock_container_status]
+    mock_status.start_time = datetime.utcnow()
+    mock_status.start_time.replace(tzinfo=tzutc())
+    mock_pod = MagicMock()
+    mock_pod.status = mock_status
+    mock_pod.metadata.name = "young-pod"
+    assert not pod_is_stuck(mock_pod, 15)
 
 
 @mock.patch('kubernetes.client.CoreV1Api.delete_namespaced_pod')

@@ -1,8 +1,16 @@
+import os
+import sys
 import argparse
 import logging
+from datetime import datetime
 
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
+
+if os.environ.get('DEBUG'):
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+else:
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
 # All Containers in the Pod have terminated in success, and will not be restarted.
@@ -21,6 +29,23 @@ POD_REASON_EVICTED = 'evicted'
 # * Never: Pod phase becomes Failed.
 POD_RESTART_POLICY_NEVER = 'never'
 
+def pod_is_stuck(pod, stuck_age_minutes):
+    """ We can define a pod as stuck
+    when the containers are not ready
+    for more than X minutes.
+    """
+    all_containers_ready = True
+    age_seconds = (datetime.utcnow() - pod.status.start_time.replace(tzinfo=None)).total_seconds()
+    age_minutes = age_seconds / 60
+    for container in pod.status.container_statuses:
+        if not container.ready:
+            all_containers_ready = False
+            break
+    stuck = (not all_containers_ready) and age_minutes > stuck_age_minutes
+    if stuck:
+        logging.warning(f"Found pod {pod.metadata.name} is stuck - not all containers " + \
+                        f"are ready and it's older than {stuck_age_minutes} minutes")
+    return stuck
 
 def delete_pod(name, namespace):
     core_v1 = client.CoreV1Api()
@@ -35,7 +60,7 @@ def delete_pod(name, namespace):
     logging.warning(api_response)
 
 
-def cleanup(namespace):
+def cleanup(namespace, stuck_age_minutes=15):
     logging.info('Loading Kubernetes configuration')
     config.load_incluster_config()
     logging.debug('Initializing Kubernetes client')
@@ -51,7 +76,8 @@ def cleanup(namespace):
 
         if (pod_phase == POD_SUCCEEDED or
            (pod_phase == POD_FAILED and pod_restart_policy == POD_RESTART_POLICY_NEVER) or
-           (pod_reason == POD_REASON_EVICTED)):
+           (pod_reason == POD_REASON_EVICTED) or
+            pod_is_stuck(pod, stuck_age_minutes)):
 
             logging.info('Deleting pod "{}" phase "{}" and reason "{}", restart policy "{}"'.format(
                 pod.metadata.name, pod_phase, pod_reason, pod_restart_policy)
@@ -68,5 +94,7 @@ def main():
     parser = argparse.ArgumentParser(description='Clean up k8s pods in evicted/failed/succeeded states.')
     parser.add_argument('--namespace', dest='namespace', default='default', type=str,
                         help='Namespace')
+    parser.add_argument('--stuck-age-minutes', dest='stuck_age_minutes', default=15, type=int,
+                        help='How many minutes without container readiness until the pod is considered stuck')
     args = parser.parse_args()
-    cleanup(args.namespace)
+    cleanup(args.namespace, args.stuck_age_minutes)
