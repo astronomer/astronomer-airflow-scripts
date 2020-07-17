@@ -29,6 +29,7 @@ POD_REASON_EVICTED = 'evicted'
 # * Never: Pod phase becomes Failed.
 POD_RESTART_POLICY_NEVER = 'never'
 
+
 def pod_is_stuck(pod, stuck_age_minutes):
     """ We can define a pod as stuck
     when the containers are not ready
@@ -43,9 +44,10 @@ def pod_is_stuck(pod, stuck_age_minutes):
             break
     stuck = (not all_containers_ready) and age_minutes > stuck_age_minutes
     if stuck:
-        logging.warning(f"Found pod {pod.metadata.name} is stuck - not all containers " + \
+        logging.warning(f"Found pod {pod.metadata.name} is stuck - not all containers " +
                         f"are ready and it's older than {stuck_age_minutes} minutes")
     return stuck
+
 
 def delete_pod(name, namespace):
     core_v1 = client.CoreV1Api()
@@ -60,6 +62,15 @@ def delete_pod(name, namespace):
     logging.warning(api_response)
 
 
+def should_delete_pod(pod, stuck_age_minutes):
+    pod_phase = pod.status.phase.lower()
+    pod_reason = pod.status.reason.lower() if pod.status.reason else ''
+    pod_restart_policy = pod.spec.restart_policy.lower()
+    return (pod_phase == POD_SUCCEEDED or
+            (pod_phase == POD_FAILED and pod_restart_policy == POD_RESTART_POLICY_NEVER) or
+            (pod_reason == POD_REASON_EVICTED) or pod_is_stuck(pod, stuck_age_minutes))
+
+
 def cleanup(namespace, stuck_age_minutes=15):
     logging.info('Loading Kubernetes configuration')
     config.load_incluster_config()
@@ -70,14 +81,12 @@ def cleanup(namespace, stuck_age_minutes=15):
 
     for pod in pod_list.items:
         logging.info('Inspecting pod {pod}'.format(pod=pod.metadata.name))
+
         pod_phase = pod.status.phase.lower()
         pod_reason = pod.status.reason.lower() if pod.status.reason else ''
         pod_restart_policy = pod.spec.restart_policy.lower()
 
-        if (pod_phase == POD_SUCCEEDED or
-           (pod_phase == POD_FAILED and pod_restart_policy == POD_RESTART_POLICY_NEVER) or
-           (pod_reason == POD_REASON_EVICTED) or
-            pod_is_stuck(pod, stuck_age_minutes)):
+        if should_delete_pod(pod, stuck_age_minutes):
 
             logging.info('Deleting pod "{}" phase "{}" and reason "{}", restart policy "{}"'.format(
                 pod.metadata.name, pod_phase, pod_reason, pod_restart_policy)
