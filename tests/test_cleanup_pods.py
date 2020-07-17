@@ -1,9 +1,8 @@
-from unittest import mock
 from datetime import datetime
+from unittest import mock
 from unittest.mock import MagicMock
 
 from dateutil.tz import tzutc
-
 import kubernetes
 
 from astronomer.cleanup_pods.command_line import cleanup, delete_pod, pod_is_stuck

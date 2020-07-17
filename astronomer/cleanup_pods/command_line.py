@@ -1,8 +1,8 @@
-import os
 import argparse
-import sys
 from datetime import datetime
 import logging
+import os
+import sys
 
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
