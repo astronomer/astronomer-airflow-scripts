@@ -1,6 +1,7 @@
 from unittest import mock
-from unittest.mock import MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock
+
 from dateutil.tz import tzutc
 
 import kubernetes
