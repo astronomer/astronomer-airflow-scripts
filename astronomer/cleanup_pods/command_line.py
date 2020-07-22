@@ -71,7 +71,7 @@ def should_delete_pod(pod, stuck_age_minutes):
             (pod_reason == POD_REASON_EVICTED) or pod_is_stuck(pod, stuck_age_minutes))
 
 
-def cleanup(namespace, stuck_age_minutes=15):
+def cleanup(namespace, stuck_age_minutes=60):
     logging.info('Loading Kubernetes configuration')
     config.load_incluster_config()
     logging.debug('Initializing Kubernetes client')
@@ -103,7 +103,7 @@ def main():
     parser = argparse.ArgumentParser(description='Clean up k8s pods in evicted/failed/succeeded states.')
     parser.add_argument('--namespace', dest='namespace', default='default', type=str,
                         help='Namespace')
-    parser.add_argument('--stuck-age-minutes', dest='stuck_age_minutes', default=15, type=int,
+    parser.add_argument('--stuck-age-minutes', dest='stuck_age_minutes', default=60, type=int,
                         help='How many minutes without container readiness until the pod is considered stuck')
     args = parser.parse_args()
     cleanup(args.namespace, args.stuck_age_minutes)
