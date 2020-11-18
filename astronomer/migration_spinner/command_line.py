@@ -31,8 +31,9 @@ def spinner(timeout):
                 logging.info('Current heads: {}'.format(db_heads))
                 break
             elif ticker >= timeout:
-                raise TimeoutError("There are still unapplied migrations after {} "
-                                   "seconds".format(ticker, timeout))
+                raise TimeoutError(
+                    "There are still unapplied migrations after {} seconds".format(timeout)
+                )
             ticker += 1
             time.sleep(1)
             logging.info('Waiting for migrations... {} second(s)'.format(ticker))
