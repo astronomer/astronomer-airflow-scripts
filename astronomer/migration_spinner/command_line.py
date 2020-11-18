@@ -17,7 +17,7 @@ def spinner(timeout):
     directory = os.path.join(package_dir, 'migrations')
     config = Config(os.path.join(package_dir, 'alembic.ini'))
     config.set_main_option('script_location', directory)
-    config.set_main_option('sqlalchemy.url', settings.SQL_ALCHEMY_CONN)
+    config.set_main_option('sqlalchemy.url', settings.SQL_ALCHEMY_CONN.replace('%', '%%'))
     script_ = ScriptDirectory.from_config(config)
 
     with settings.engine.connect() as connection:
