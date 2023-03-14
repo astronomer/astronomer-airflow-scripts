@@ -49,6 +49,10 @@ jobs:
             - ".venv"
             - "~/.cache"
       - run:
+          name: lint
+          command: |
+            .venv/bin/ruff check .
+      - run:
           name: run_tests
           command: |
             . .venv/bin/activate

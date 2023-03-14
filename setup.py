@@ -26,7 +26,7 @@ def read(*parts):
 
 
 def desc():
-    return read('README.md')
+    return read("README.md")
 
 
 # https://packaging.python.org/guides/single-sourcing-package-version/
@@ -41,7 +41,8 @@ def find_version(*paths):
 # Cribbed from https://circleci.com/blog/continuously-deploying-python-packages-to-pypi-with-circleci/
 class VerifyVersionCommand(Command):
     """Custom command to verify that the git tag matches our version"""
-    description = 'verify that the git tag matches our version'
+
+    description = "verify that the git tag matches our version"
     user_options = []  # type: ignore
 
     def initialize_options(self):
@@ -51,7 +52,7 @@ class VerifyVersionCommand(Command):
         pass
 
     def run(self):
-        tag = os.getenv('CIRCLE_TAG')
+        tag = os.getenv("CIRCLE_TAG")
 
         if tag != "v" + VERSION:
             info = "Git tag: {0} does not match the version of this app: v{1}".format(
@@ -60,55 +61,51 @@ class VerifyVersionCommand(Command):
             exit(info)
 
 
-VERSION = find_version('version.py')
+VERSION = find_version("version.py")
 
 setup(
-    name='astronomer-airflow-scripts',
+    name="astronomer-airflow-scripts",
     version=VERSION,
-    url='https://github.com/astronomer/astronomer-airflow-scripts',
-    license='Apache2',
-    author='astronomerio',
-    author_email='humans@astronomer.io',
-    description='',
+    url="https://github.com/astronomer/astronomer-airflow-scripts",
+    license="Apache2",
+    author="astronomerio",
+    author_email="humans@astronomer.io",
+    description="",
     long_description=desc(),
     long_description_content_type="text/markdown",
-    packages=find_namespace_packages(exclude='tests'),
-    package_data={'': ['LICENSE']},
+    packages=find_namespace_packages(exclude="tests"),
+    package_data={"": ["LICENSE"]},
     entry_points={
-        'console_scripts': [
-            'airflow-migration-spinner=astronomer.migration_spinner.command_line:main',
-            'airflow-cleanup-pods=astronomer.cleanup_pods.command_line:main',
+        "console_scripts": [
+            "airflow-migration-spinner=astronomer.migration_spinner.command_line:main",
+            "airflow-cleanup-pods=astronomer.cleanup_pods.command_line:main",
         ]
     },
     include_package_data=True,
     zip_safe=True,
-    platforms='any',
+    platforms="any",
     install_requires=[
-        'apache-airflow[kubernetes]>=1.10.0',
+        "apache-airflow[kubernetes]>=1.10.0",
     ],
     setup_requires=[
-        'pytest-runner~=4.0',
-        'wheel',
+        "wheel",
     ],
-    tests_require=[
-        'astronomer-airflow-scripts[test]'
-    ],
+    tests_require=["astronomer-airflow-scripts[test]"],
     extras_require={
-        'test': [
-            'flake8-import-order>=0.18',
-            'pytest',
-            'pytest-mock',
-            'pytest-flake8',
+        "test": [
+            "pytest",
+            "pytest-mock",
+            "ruff"
         ],
     },
     classifiers=[
-        'Environment :: Web Environment',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Programming Language :: Python :: 3',
+        "Environment :: Web Environment",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Programming Language :: Python :: 3",
     ],
-    cmdclass={"verify": VerifyVersionCommand}
+    cmdclass={"verify": VerifyVersionCommand},
 )

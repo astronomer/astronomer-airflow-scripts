@@ -1,2 +1,11 @@
 [build-system]
-requires = ["setuptools>=40.8.0", "wheel", "pytest-runner~=4.0"]
+requires = ["setuptools>=40.8.0", "wheel"]
+
+[tool.ruff]
+line-length=160
+
+extend-select = ["I", "RUF"]
+
+[tool.pytest.ini_options]
+addopts="--tb=short"
+junit_family="xunit2"
