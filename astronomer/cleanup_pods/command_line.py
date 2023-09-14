@@ -48,6 +48,9 @@ def cleanup(namespace):
         pod_phase = pod.status.phase.lower()
         pod_reason = pod.status.reason.lower() if pod.status.reason else ''
         pod_restart_policy = pod.spec.restart_policy.lower()
+        if pod.metadata.labels.get('airflow_kpo_in_cluster'):
+            logging.info("Skipping KPO Pod: {pod}".format(pod=pod.metadata.name))
+            continue
 
         if (pod_phase == POD_SUCCEEDED or
            (pod_phase == POD_FAILED and pod_restart_policy == POD_RESTART_POLICY_NEVER) or
