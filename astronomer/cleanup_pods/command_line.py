@@ -4,6 +4,8 @@ import logging
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
 
+from datetime import datetime, timezone
+
 # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
 # All Containers in the Pod have terminated in success, and will not be restarted.
 POD_SUCCEEDED = 'succeeded'
@@ -20,6 +22,7 @@ POD_REASON_EVICTED = 'evicted'
 # * OnFailure: Restart Container; Pod phase stays Running.
 # * Never: Pod phase becomes Failed.
 POD_RESTART_POLICY_NEVER = 'never'
+KPO_POD_DELETION_GRACE_PERIOD = int(os.environ.get('KPO_POD_DELETION_GRACE_PERIOD', '3600'))
 
 
 def delete_pod(name, namespace):
@@ -48,14 +51,23 @@ def cleanup(namespace):
         pod_phase = pod.status.phase.lower()
         pod_reason = pod.status.reason.lower() if pod.status.reason else ''
         pod_restart_policy = pod.spec.restart_policy.lower()
-        if pod.metadata.labels.get('airflow_kpo_in_cluster'):
-            logging.info("Skipping KPO Pod: {pod}".format(pod=pod.metadata.name))
-            continue
+          
 
         if (pod_phase == POD_SUCCEEDED or
            (pod_phase == POD_FAILED and pod_restart_policy == POD_RESTART_POLICY_NEVER) or
            (pod_reason == POD_REASON_EVICTED)):
-
+            if pod.metadata.labels.get('airflow_kpo_in_cluster'):
+                terminal_state_duration_mins = (
+                    (
+                        datetime.now(timezone.utc)
+                        - max(
+                            x.last_transition_time
+                            for x in pod.status.conditions
+                        ).replace(tzinfo=None)
+                    )
+                ).total_seconds()
+                if terminal_state_duration_mins<=KPO_POD_DELETION_GRACE_PERIOD:
+                    continue
             logging.info('Deleting pod "{}" phase "{}" and reason "{}", restart policy "{}"'.format(
                 pod.metadata.name, pod_phase, pod_reason, pod_restart_policy)
             )
