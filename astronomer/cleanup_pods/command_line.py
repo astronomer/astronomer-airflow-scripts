@@ -57,7 +57,7 @@ def cleanup(namespace):
            (pod_phase == POD_FAILED and pod_restart_policy == POD_RESTART_POLICY_NEVER) or
            (pod_reason == POD_REASON_EVICTED)):
             if pod.metadata.labels.get('airflow_kpo_in_cluster'):
-                terminal_state_duration_mins = (
+                terminal_state_duration = (
                     (
                         datetime.now(timezone.utc)
                         - max(
@@ -66,7 +66,7 @@ def cleanup(namespace):
                         ).replace(tzinfo=None)
                     )
                 ).total_seconds()
-                if terminal_state_duration_mins<=KPO_POD_DELETION_GRACE_PERIOD:
+                if terminal_state_duration<=KPO_POD_DELETION_GRACE_PERIOD:
                     continue
             logging.info('Deleting pod "{}" phase "{}" and reason "{}", restart policy "{}"'.format(
                 pod.metadata.name, pod_phase, pod_reason, pod_restart_policy)
