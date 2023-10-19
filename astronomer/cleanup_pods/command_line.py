@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
@@ -63,7 +64,7 @@ def cleanup(namespace):
                         - max(
                             x.last_transition_time
                             for x in pod.status.conditions
-                        ).replace(tzinfo=None)
+                        ).replace(tzinfo=timezone.utc)
                     )
                 ).total_seconds()
                 if terminal_state_duration<=KPO_POD_DELETION_GRACE_PERIOD:
