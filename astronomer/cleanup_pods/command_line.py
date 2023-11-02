@@ -1,11 +1,10 @@
 import argparse
 import logging
 import os
+from datetime import datetime, timezone
 
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
-
-from datetime import datetime, timezone
 
 # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/
 # All Containers in the Pod have terminated in success, and will not be restarted.
