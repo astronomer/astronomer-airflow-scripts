@@ -1,5 +1,7 @@
 import argparse
 import logging
+import os
+from datetime import datetime, timezone
 
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
@@ -20,6 +22,7 @@ POD_REASON_EVICTED = 'evicted'
 # * OnFailure: Restart Container; Pod phase stays Running.
 # * Never: Pod phase becomes Failed.
 POD_RESTART_POLICY_NEVER = 'never'
+KPO_POD_DELETION_GRACE_PERIOD = int(os.environ.get('KPO_POD_DELETION_GRACE_PERIOD', '3600'))
 
 
 def delete_pod(name, namespace):
@@ -48,11 +51,23 @@ def cleanup(namespace):
         pod_phase = pod.status.phase.lower()
         pod_reason = pod.status.reason.lower() if pod.status.reason else ''
         pod_restart_policy = pod.spec.restart_policy.lower()
+          
 
         if (pod_phase == POD_SUCCEEDED or
            (pod_phase == POD_FAILED and pod_restart_policy == POD_RESTART_POLICY_NEVER) or
            (pod_reason == POD_REASON_EVICTED)):
-
+            if pod.metadata.labels.get('airflow_kpo_in_cluster'):
+                terminal_state_duration = (
+                    (
+                        datetime.now(timezone.utc)
+                        - max(
+                            x.last_transition_time
+                            for x in pod.status.conditions
+                        ).replace(tzinfo=timezone.utc)
+                    )
+                ).total_seconds()
+                if terminal_state_duration<=KPO_POD_DELETION_GRACE_PERIOD:
+                    continue
             logging.info('Deleting pod "{}" phase "{}" and reason "{}", restart policy "{}"'.format(
                 pod.metadata.name, pod_phase, pod_reason, pod_restart_policy)
             )
