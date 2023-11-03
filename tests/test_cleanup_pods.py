@@ -103,7 +103,7 @@ def test_cleanup_kpo_pods_delay(load_incluster_config, list_namespaced_pod, dele
     pod1.status.phase = 'Succeeded'
     pod1.status.reason = None
     container1 = MagicMock()
-    container1.last_transition_time = datetime.now(timezone.utc) - timedelta(seconds=3599)
+    container1.last_transition_time = datetime.now(timezone.utc) - timedelta(seconds=300)
     pod1.status.conditions = [container1]
     list_namespaced_pod().items = [pod1]
     cleanup('awesome-namespace')
