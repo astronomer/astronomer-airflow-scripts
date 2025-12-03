@@ -84,6 +84,7 @@ jobs:
           command: |-
             rm /home/circleci/project/.venv/bin/python*
             python3 -m venv /home/circleci/project/.venv
+            /home/circleci/project/.venv/bin/pip install setuptools
       - run:
           name: verify tag
           command: |-
